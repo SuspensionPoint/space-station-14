@@ -1,0 +1,120 @@
+<editor:MapEditorScreen xmlns="https://spacestation14.io"
+    xmlns:editor="clr-namespace:Content.MapEditor.UI"
+    xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls;assembly=Content.Client"
+    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client">
+
+    <LayoutContainer Name="RootLayout" HorizontalExpand="True" VerticalExpand="True">
+        <BoxContainer Name="MainLayout" Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
+
+            <!-- MenuBar placeholder: populated in code-behind -->
+            <PanelContainer HorizontalExpand="True" MinHeight="24">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#1E1E28DD" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Name="MenuBarContainer" Orientation="Horizontal"
+                              HorizontalExpand="True" />
+            </PanelContainer>
+
+            <!-- Grid tab bar -->
+            <PanelContainer Name="GridTabBarPanel" HorizontalExpand="True" MinHeight="28">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#1E1E1EDD" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Name="GridTabBar" Orientation="Horizontal" Margin="4 2" />
+            </PanelContainer>
+
+            <!-- Middle row: Toolbar | Viewport | Palette -->
+            <BoxContainer Name="MiddleRow" Orientation="Horizontal" VerticalExpand="True" HorizontalExpand="True">
+
+                <!-- Left toolbar -->
+                <PanelContainer Name="ToolbarPanel" MinWidth="36">
+                    <PanelContainer.PanelOverride>
+                        <graphics:StyleBoxFlat BackgroundColor="#2A2A2ADD" />
+                    </PanelContainer.PanelOverride>
+                    <BoxContainer Name="ToolbarButtons" Orientation="Vertical" Margin="2 4" />
+                </PanelContainer>
+
+                <!-- Main viewport fills remaining space -->
+                <LayoutContainer Name="ViewportContainer" VerticalExpand="True" HorizontalExpand="True">
+                    <controls:MainViewport Name="MainViewport" Access="Public" />
+                </LayoutContainer>
+
+                <!-- Right sidebar: Entity Info Panel + Palette tabs -->
+                <BoxContainer Name="RightSidebar" Orientation="Vertical" MinWidth="360">
+
+                    <!-- Entity Info Panel (hidden when no entity selected) -->
+                    <PanelContainer Name="EntityInfoPanel" HorizontalExpand="True" Visible="False">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#1A2A1ADD" />
+                        </PanelContainer.PanelOverride>
+                        <BoxContainer Name="EntityInfoContent" Orientation="Vertical" Margin="6 4" />
+                    </PanelContainer>
+
+                    <!-- Preview panel showing the selected tile/entity at larger size -->
+                    <PanelContainer Name="PreviewPanel" HorizontalExpand="True" MinHeight="120" Visible="False">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#1E2E1EDD" />
+                        </PanelContainer.PanelOverride>
+                        <BoxContainer Orientation="Vertical" HorizontalAlignment="Center" Margin="4">
+                            <TextureRect Name="PreviewTexture" MinWidth="96" MinHeight="96"
+                                         HorizontalAlignment="Center" Stretch="KeepAspectCentered" />
+                            <Label Name="PreviewLabel" Text="" HorizontalAlignment="Center"
+                                   Margin="0 2 0 0" />
+                        </BoxContainer>
+                    </PanelContainer>
+
+                    <!-- Infrastructure panel (shown when cable/pipe tools are active) -->
+                    <PanelContainer Name="InfrastructurePanel" HorizontalExpand="True" Visible="False">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#1A1A2ADD" />
+                        </PanelContainer.PanelOverride>
+                        <BoxContainer Name="InfrastructurePanelContent" Orientation="Vertical" Margin="6 4" />
+                    </PanelContainer>
+
+                    <!-- Palette panel with Tiles/Entities tabs -->
+                    <PanelContainer Name="PalettePanel" VerticalExpand="True">
+                        <PanelContainer.PanelOverride>
+                            <graphics:StyleBoxFlat BackgroundColor="#2A2A2ADD" />
+                        </PanelContainer.PanelOverride>
+                        <TabContainer Name="PaletteTabContainer" VerticalExpand="True" HorizontalExpand="True">
+
+                            <!-- Tiles tab -->
+                            <BoxContainer Name="TileTabContent" Orientation="Vertical" Margin="4">
+                                <LineEdit Name="TileSearchEdit" HorizontalExpand="True" PlaceHolder="Search tiles..." Margin="0 0 0 4" />
+                                <ScrollContainer VerticalExpand="True" HorizontalExpand="True" HScrollEnabled="False">
+                                    <GridContainer Name="TileGrid" HorizontalExpand="True" Columns="7" />
+                                </ScrollContainer>
+                            </BoxContainer>
+
+                            <!-- Entities tab -->
+                            <BoxContainer Name="EntityTabContent" Orientation="Vertical" Margin="4">
+                                <LineEdit Name="EntitySearchEdit" HorizontalExpand="True" PlaceHolder="Search entities..." Margin="0 0 0 4" />
+                                <ScrollContainer Name="EntityScrollContainer" VerticalExpand="True" HorizontalExpand="True">
+                                    <BoxContainer Name="EntityListContainer" Orientation="Vertical" HorizontalExpand="True" />
+                                </ScrollContainer>
+                            </BoxContainer>
+
+                        </TabContainer>
+                    </PanelContainer>
+
+                </BoxContainer>
+
+            </BoxContainer>
+
+            <!-- Status bar at bottom -->
+            <PanelContainer Name="StatusBarPanel" HorizontalExpand="True">
+                <PanelContainer.PanelOverride>
+                    <graphics:StyleBoxFlat BackgroundColor="#222222DD" />
+                </PanelContainer.PanelOverride>
+                <BoxContainer Orientation="Horizontal" Margin="4 2">
+                    <Label Name="StatusCoords" Text="(0, 0)" MinWidth="120" />
+                    <Label Name="StatusZoom" Text="Zoom: 1.0x" MinWidth="100" />
+                    <Label Name="StatusTool" Text="Tool: Paint" MinWidth="100" />
+                    <Label Name="StatusDimension" Text="" MinWidth="80" />
+                    <Label Name="StatusInfo" Text="No map loaded" HorizontalExpand="True" />
+                </BoxContainer>
+            </PanelContainer>
+
+        </BoxContainer>
+    </LayoutContainer>
+</editor:MapEditorScreen>
