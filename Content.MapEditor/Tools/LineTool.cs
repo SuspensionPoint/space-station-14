@@ -20,18 +20,18 @@ public sealed class LineTool : IEditorTool
     /// <summary>Current end point of the drag, exposed for overlay preview.</summary>
     public Vector2i? DragEnd { get; private set; }
 
-    public void OnMouseDown(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         DragStart = tilePos;
         DragEnd = tilePos;
     }
 
-    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         DragEnd = tilePos;
     }
 
-    public void OnMouseUp(ToolContext ctx)
+    public void OnMouseUp(ToolContext ctx, EditorInput input)
     {
         if (DragStart == null || DragEnd == null)
             return;

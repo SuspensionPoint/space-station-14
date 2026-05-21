@@ -20,8 +20,7 @@ public sealed partial class MapEditorState
 {
     private void UpdatePan()
     {
-        var mouseDown = _input.IsKeyDown(Keyboard.Key.MouseRight)
-                     || _input.IsKeyDown(Keyboard.Key.MouseMiddle);
+        var mouseDown = _input.IsKeyDown(Keyboard.Key.MouseMiddle);
         var currentPos = _input.MouseScreenPosition;
 
         if (mouseDown)

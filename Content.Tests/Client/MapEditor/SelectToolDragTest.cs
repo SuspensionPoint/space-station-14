@@ -1,4 +1,5 @@
 using System;
+using Content.MapEditor;
 using Content.MapEditor.Tools;
 using NUnit.Framework;
 using Robust.Shared.Maths;
@@ -28,7 +29,7 @@ public sealed class SelectToolDragTest
         Assert.That(tool.Selection, Is.Null, "Selection should be null before any input");
 
         // Step 1: Mouse down at (5, 5).
-        tool.OnMouseDown(null!, new Vector2i(5, 5));
+        tool.OnMouseDown(null!, new Vector2i(5, 5), new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         Assert.That(tool.DragStart, Is.Not.Null, "DragStart should be set after OnMouseDown");
         Assert.That(tool.DragStart!.Value, Is.EqualTo(new Vector2i(5, 5)), "DragStart should be (5,5)");
@@ -37,14 +38,14 @@ public sealed class SelectToolDragTest
         Assert.That(tool.Selection, Is.Null, "Selection should be null during drag");
 
         // Step 2: Drag to (8, 8).
-        tool.OnMouseDrag(null!, new Vector2i(8, 8));
+        tool.OnMouseDrag(null!, new Vector2i(8, 8), new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         Assert.That(tool.DragStart!.Value, Is.EqualTo(new Vector2i(5, 5)), "DragStart should remain (5,5)");
         Assert.That(tool.DragEnd!.Value, Is.EqualTo(new Vector2i(8, 8)), "DragEnd should update to (8,8)");
         Assert.That(tool.Selection, Is.Null, "Selection should still be null during drag");
 
         // Step 3: Mouse up.
-        tool.OnMouseUp(null!);
+        tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         Assert.That(tool.DragStart, Is.Null, "DragStart should be null after mouse up (drag ended)");
         Assert.That(tool.DragEnd, Is.Null, "DragEnd should be null after mouse up (drag ended)");
@@ -61,9 +62,9 @@ public sealed class SelectToolDragTest
     {
         var tool = new SelectTool();
 
-        tool.OnMouseDown(null!, new Vector2i(8, 8));
-        tool.OnMouseDrag(null!, new Vector2i(5, 5));
-        tool.OnMouseUp(null!);
+        tool.OnMouseDown(null!, new Vector2i(8, 8), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+        tool.OnMouseDrag(null!, new Vector2i(5, 5), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+        tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         Assert.That(tool.Selection!.Value, Is.EqualTo(new Box2i(5, 5, 9, 9)),
             "Reverse drag should normalize to same box as forward drag");
@@ -78,13 +79,13 @@ public sealed class SelectToolDragTest
         var tool = new SelectTool();
 
         // First drag.
-        tool.OnMouseDown(null!, new Vector2i(0, 0));
-        tool.OnMouseDrag(null!, new Vector2i(3, 3));
-        tool.OnMouseUp(null!);
+        tool.OnMouseDown(null!, new Vector2i(0, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+        tool.OnMouseDrag(null!, new Vector2i(3, 3), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+        tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
         Assert.That(tool.Selection, Is.Not.Null, "First selection should exist");
 
         // Second drag.
-        tool.OnMouseDown(null!, new Vector2i(10, 10));
+        tool.OnMouseDown(null!, new Vector2i(10, 10), new EditorInput(){ InputButton =  EditorInputButton.Primary });
         Assert.That(tool.Selection, Is.Null, "Previous selection should be cleared on new drag start");
         Assert.That(tool.DragStart, Is.Not.Null, "New drag should start");
         Assert.That(tool.DragStart!.Value, Is.EqualTo(new Vector2i(10, 10)));
@@ -98,8 +99,8 @@ public sealed class SelectToolDragTest
     {
         var tool = new SelectTool();
 
-        tool.OnMouseDown(null!, new Vector2i(5, 5));
-        tool.OnMouseUp(null!);
+        tool.OnMouseDown(null!, new Vector2i(5, 5), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+        tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         Assert.That(tool.Selection!.Value, Is.EqualTo(new Box2i(5, 5, 6, 6)),
             "Single-tile click should produce a 1x1 selection box");
@@ -113,21 +114,21 @@ public sealed class SelectToolDragTest
     {
         var tool = new SelectTool();
 
-        tool.OnMouseDown(null!, new Vector2i(5, 5));
+        tool.OnMouseDown(null!, new Vector2i(5, 5), new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
-        tool.OnMouseDrag(null!, new Vector2i(6, 5));
+        tool.OnMouseDrag(null!, new Vector2i(6, 5), new EditorInput(){ InputButton =  EditorInputButton.Primary });
         Assert.That(tool.DragEnd!.Value, Is.EqualTo(new Vector2i(6, 5)));
 
-        tool.OnMouseDrag(null!, new Vector2i(7, 6));
+        tool.OnMouseDrag(null!, new Vector2i(7, 6), new EditorInput(){ InputButton =  EditorInputButton.Primary });
         Assert.That(tool.DragEnd!.Value, Is.EqualTo(new Vector2i(7, 6)));
 
-        tool.OnMouseDrag(null!, new Vector2i(8, 8));
+        tool.OnMouseDrag(null!, new Vector2i(8, 8), new EditorInput(){ InputButton =  EditorInputButton.Primary });
         Assert.That(tool.DragEnd!.Value, Is.EqualTo(new Vector2i(8, 8)));
 
         // DragStart should not change.
         Assert.That(tool.DragStart!.Value, Is.EqualTo(new Vector2i(5, 5)));
 
-        tool.OnMouseUp(null!);
+        tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
         Assert.That(tool.Selection!.Value, Is.EqualTo(new Box2i(5, 5, 9, 9)));
     }
 
@@ -140,8 +141,8 @@ public sealed class SelectToolDragTest
     {
         var tool = new SelectTool();
 
-        tool.OnMouseDown(null!, new Vector2i(5, 5));
-        tool.OnMouseDrag(null!, new Vector2i(8, 8));
+        tool.OnMouseDown(null!, new Vector2i(5, 5), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+        tool.OnMouseDrag(null!, new Vector2i(8, 8), new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         // Simulate what UpdateShapePreview does:
         Assert.That(tool.DragStart, Is.Not.Null, "DragStart must be non-null during drag for overlay");
@@ -166,15 +167,15 @@ public sealed class SelectToolDragTest
     {
         var tool = new SelectTool();
 
-        tool.OnMouseDown(null!, new Vector2i(2, 3));
-        tool.OnMouseDrag(null!, new Vector2i(5, 7));
+        tool.OnMouseDown(null!, new Vector2i(2, 3), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+        tool.OnMouseDrag(null!, new Vector2i(5, 7), new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         // During drag: DragStart/DragEnd are set.
         Assert.That(tool.DragStart, Is.Not.Null);
         Assert.That(tool.DragEnd, Is.Not.Null);
         Assert.That(tool.Selection, Is.Null);
 
-        tool.OnMouseUp(null!);
+        tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         // After mouse up: DragStart/DragEnd are null, Selection is set.
         Assert.That(tool.DragStart, Is.Null, "DragStart should be null after mouse up");
@@ -191,7 +192,7 @@ public sealed class SelectToolDragTest
     {
         var tool = new SelectTool();
 
-        tool.OnMouseUp(null!);
+        tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         Assert.That(tool.DragStart, Is.Null);
         Assert.That(tool.DragEnd, Is.Null);
@@ -219,7 +220,7 @@ public sealed class SelectToolDragTest
         {
             isToolActive = true;
             lastToolTilePos = tilePos;
-            tool.OnMouseDown(null!, tilePos);
+            tool.OnMouseDown(null!, tilePos, new EditorInput(){ InputButton =  EditorInputButton.Primary });
         }
         wasLeftDown = leftDown;
 
@@ -242,7 +243,7 @@ public sealed class SelectToolDragTest
             if (tilePos != lastToolTilePos)
             {
                 lastToolTilePos = tilePos;
-                tool.OnMouseDrag(null!, tilePos);
+                tool.OnMouseDrag(null!, tilePos, new EditorInput(){ InputButton =  EditorInputButton.Primary });
             }
         }
         wasLeftDown = leftDown;
@@ -264,7 +265,7 @@ public sealed class SelectToolDragTest
             if (tilePos != lastToolTilePos)
             {
                 lastToolTilePos = tilePos;
-                tool.OnMouseDrag(null!, tilePos);
+                tool.OnMouseDrag(null!, tilePos, new EditorInput(){ InputButton =  EditorInputButton.Primary });
             }
         }
         wasLeftDown = leftDown;
@@ -287,7 +288,7 @@ public sealed class SelectToolDragTest
         else if (!leftDown && isToolActive)
         {
             isToolActive = false;
-            tool.OnMouseUp(null!);
+            tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
         }
         wasLeftDown = leftDown;
 
@@ -315,7 +316,7 @@ public sealed class SelectToolDragTest
         var leftDown = true;
         isToolActive = true;
         lastToolTilePos = new Vector2i(5, 5);
-        tool.OnMouseDown(null!, new Vector2i(5, 5));
+        tool.OnMouseDown(null!, new Vector2i(5, 5), new EditorInput(){ InputButton =  EditorInputButton.Primary });
         wasLeftDown = leftDown;
 
         // Frames 1-5: Mouse held, but TryResolveGridTile fails (returns false).
@@ -332,7 +333,7 @@ public sealed class SelectToolDragTest
         // Frame 6: Mouse released.
         leftDown = false;
         isToolActive = false;
-        tool.OnMouseUp(null!);
+        tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
         wasLeftDown = leftDown;
 
         // Selection should be a single tile because OnMouseDrag was never called.
@@ -348,9 +349,9 @@ public sealed class SelectToolDragTest
     {
         var tool = new SelectTool();
 
-        tool.OnMouseDown(null!, new Vector2i(-3, -2));
-        tool.OnMouseDrag(null!, new Vector2i(1, 2));
-        tool.OnMouseUp(null!);
+        tool.OnMouseDown(null!, new Vector2i(-3, -2), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+        tool.OnMouseDrag(null!, new Vector2i(1, 2), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+        tool.OnMouseUp(null!, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
         Assert.That(tool.Selection!.Value, Is.EqualTo(new Box2i(-3, -2, 2, 3)));
     }

@@ -1,5 +1,6 @@
 using Content.IntegrationTests.Fixtures;
 using Content.IntegrationTests.Fixtures.Attributes;
+using Content.MapEditor;
 using Content.MapEditor.Commands;
 using Content.MapEditor.Tools;
 using Content.Shared.CCVar;
@@ -41,9 +42,9 @@ public sealed class SelectToolMoveTest : GameTest
 
             // Also seed a few surrounding tiles so the grid is stable.
             for (var x = 4; x <= 8; x++)
-                for (var y = 4; y <= 8; y++)
-                    if (x != 5 || y != 5)
-                        mapSystem.SetTile(gridUid, gridComp, new Vector2i(x, y), new Tile(1, 0, 0));
+            for (var y = 4; y <= 8; y++)
+                if (x != 5 || y != 5)
+                    mapSystem.SetTile(gridUid, gridComp, new Vector2i(x, y), new Tile(1, 0, 0));
 
             // Spawn a null-prototype entity at the center of tile (5,5).
             var tileCoords = mapSystem.GridTileToLocal(gridUid, gridComp, new Vector2i(5, 5));
@@ -63,9 +64,13 @@ public sealed class SelectToolMoveTest : GameTest
 
             // --- Step 1: Draw selection from (5,5) to (7,7) ---
             // This produces Selection = Box2i(5,5,8,8), covering tiles (5,5)…(7,7).
-            selectTool.OnMouseDown(ctx, new Vector2i(5, 5));
-            selectTool.OnMouseDrag(ctx, new Vector2i(7, 7));
-            selectTool.OnMouseUp(ctx);
+            selectTool.OnMouseDown(ctx,
+                new Vector2i(5, 5),
+                new EditorInput() { InputButton = EditorInputButton.Primary });
+            selectTool.OnMouseDrag(ctx,
+                new Vector2i(7, 7),
+                new EditorInput() { InputButton = EditorInputButton.Primary });
+            selectTool.OnMouseUp(ctx, new EditorInput() { InputButton = EditorInputButton.Primary });
 
             Assert.That(selectTool.Selection, Is.Not.Null, "Selection should be set after drag");
             var sel = selectTool.Selection!.Value;
@@ -75,14 +80,18 @@ public sealed class SelectToolMoveTest : GameTest
             Assert.That(sel.Top, Is.EqualTo(8), "Selection Top should be 8");
 
             // --- Step 2: Click inside selection at (6,6) to start a move ---
-            selectTool.OnMouseDown(ctx, new Vector2i(6, 6));
+            selectTool.OnMouseDown(ctx,
+                new Vector2i(6, 6),
+                new EditorInput() { InputButton = EditorInputButton.Primary });
             Assert.That(selectTool.IsMoving, Is.True, "Tool should be in move mode after clicking inside selection");
 
             // --- Step 3: Drag to (8,8) — net offset is (+2,+2) ---
-            selectTool.OnMouseDrag(ctx, new Vector2i(8, 8));
+            selectTool.OnMouseDrag(ctx,
+                new Vector2i(8, 8),
+                new EditorInput() { InputButton = EditorInputButton.Primary });
 
             // --- Step 4: Release — ApplyMove fires ---
-            selectTool.OnMouseUp(ctx);
+            selectTool.OnMouseUp(ctx, new EditorInput() { InputButton = EditorInputButton.Primary });
             Assert.That(selectTool.IsMoving, Is.False, "Tool should exit move mode after mouse-up");
 
             // --- Assert tile move ---
@@ -93,7 +102,9 @@ public sealed class SelectToolMoveTest : GameTest
 
             // The tile should now be at (7,7) (original position + offset (2,2)).
             var tileAt77 = mapSystem.GetTileRef(gridUid, gridCompAfter, new Vector2i(7, 7));
-            Assert.That(tileAt77.Tile.TypeId, Is.EqualTo(1), "Tile at (7,7) should have the original tile type after move");
+            Assert.That(tileAt77.Tile.TypeId,
+                Is.EqualTo(1),
+                "Tile at (7,7) should have the original tile type after move");
 
             // --- Assert entity move ---
             Assert.That(entManager.EntityExists(spawnedEntity), Is.True, "Spawned entity should still exist");
@@ -112,7 +123,9 @@ public sealed class SelectToolMoveTest : GameTest
             Assert.That(tileAt55Undo.Tile.TypeId, Is.EqualTo(1), "Tile at (5,5) should be restored after undo");
 
             // Entity should be back at tile (5,5).
-            Assert.That(entManager.EntityExists(spawnedEntity), Is.True, "Spawned entity should still exist after undo");
+            Assert.That(entManager.EntityExists(spawnedEntity),
+                Is.True,
+                "Spawned entity should still exist after undo");
             var xformUndo = entManager.GetComponent<TransformComponent>(spawnedEntity);
             var undoTile = mapSystem.CoordinatesToTile(gridUid, gridCompUndo, xformUndo.Coordinates);
             Assert.That(undoTile.X, Is.EqualTo(5), "Entity tile X should be 5 after undo");
@@ -163,8 +176,8 @@ public sealed class SelectToolMoveTest : GameTest
 
             // Seed tiles so the grid is stable.
             for (var x = 0; x <= 9; x++)
-                for (var y = 0; y <= 9; y++)
-                    mapSystem.SetTile(gridUid, gridComp, new Vector2i(x, y), new Tile(1, 0, 0));
+            for (var y = 0; y <= 9; y++)
+                mapSystem.SetTile(gridUid, gridComp, new Vector2i(x, y), new Tile(1, 0, 0));
 
             var commandStack = new CommandStack();
             var ctx = new ToolContext
@@ -187,35 +200,46 @@ public sealed class SelectToolMoveTest : GameTest
             var tool = new SelectTool();
 
             // === Step 1: Draw selection at (2,2)..(3,3) → Box2i(2,2,4,4). ===
-            tool.OnMouseDown(ctx, new Vector2i(2, 2));
-            tool.OnMouseDrag(ctx, new Vector2i(3, 3));
-            tool.OnMouseUp(ctx);
+            tool.OnMouseDown(ctx, new Vector2i(2, 2), new EditorInput() { InputButton = EditorInputButton.Primary });
+            tool.OnMouseDrag(ctx, new Vector2i(3, 3), new EditorInput() { InputButton = EditorInputButton.Primary });
+            tool.OnMouseUp(ctx, new EditorInput() { InputButton = EditorInputButton.Primary });
 
-            Assert.That(tool.Selection!.Value, Is.EqualTo(new Box2i(2, 2, 4, 4)),
+            Assert.That(tool.Selection!.Value,
+                Is.EqualTo(new Box2i(2, 2, 4, 4)),
                 "Selection should be Box2i(2,2,4,4) after initial drag");
 
             // === Step 2: First move — click inside, drag (+3,0), release. ===
-            tool.OnMouseDown(ctx, new Vector2i(3, 3));  // inside selection
+            tool.OnMouseDown(ctx,
+                new Vector2i(3, 3),
+                new EditorInput() { InputButton = EditorInputButton.Primary }); // inside selection
             Assert.That(tool.IsMoving, Is.True, "Should enter move mode");
 
-            tool.OnMouseDrag(ctx, new Vector2i(6, 3));  // delta = (+3, 0)
-            tool.OnMouseUp(ctx);                        // ApplyMove: source=(2,2,4,4), offset=(+3,0)
+            tool.OnMouseDrag(ctx,
+                new Vector2i(6, 3),
+                new EditorInput() { InputButton = EditorInputButton.Primary }); // delta = (+3, 0)
+            tool.OnMouseUp(ctx,
+                new EditorInput()
+                    { InputButton = EditorInputButton.Primary }); // ApplyMove: source=(2,2,4,4), offset=(+3,0)
             Assert.That(tool.IsMoving, Is.False, "Should exit move mode after mouse-up");
 
             // Tile at source should now be empty; destination should have the tile.
             var gcAfter1 = entManager.GetComponent<MapGridComponent>(gridUid);
             Assert.That(mapSystem.GetTileRef(gridUid, gcAfter1, new Vector2i(2, 2)).Tile.IsEmpty,
-                Is.True, "Source tile (2,2) should be empty after first move");
+                Is.True,
+                "Source tile (2,2) should be empty after first move");
             Assert.That(mapSystem.GetTileRef(gridUid, gcAfter1, new Vector2i(5, 2)).Tile.IsEmpty,
-                Is.False, "Destination tile (5,2) should be filled after first move");
+                Is.False,
+                "Destination tile (5,2) should be filled after first move");
 
             // Check entity state after first move.
             var entXformAfter1 = entManager.GetComponent<TransformComponent>(testEntity);
             var localAfter1 = entXformAfter1.LocalPosition;
             var parentAfter1 = entXformAfter1.ParentUid;
-            Assert.That(parentAfter1, Is.EqualTo(gridUid),
+            Assert.That(parentAfter1,
+                Is.EqualTo(gridUid),
                 $"Entity parent should still be grid after first move, got {parentAfter1}");
-            Assert.That(Math.Abs(localAfter1.X - (initialLocalPos.X + 3)) < 0.1f, Is.True,
+            Assert.That(Math.Abs(localAfter1.X - (initialLocalPos.X + 3)) < 0.1f,
+                Is.True,
                 $"Entity local X should be {initialLocalPos.X + 3} after first move, got {localAfter1.X}");
 
             // === Step 3: Undo — tiles and entities revert. ===
@@ -224,41 +248,54 @@ public sealed class SelectToolMoveTest : GameTest
 
             var gcUndo = entManager.GetComponent<MapGridComponent>(gridUid);
             Assert.That(mapSystem.GetTileRef(gridUid, gcUndo, new Vector2i(2, 2)).Tile.IsEmpty,
-                Is.False, "Source tile (2,2) should be restored after undo");
+                Is.False,
+                "Source tile (2,2) should be restored after undo");
 
             // Entity should be back at original local position.
             var entXformUndo = entManager.GetComponent<TransformComponent>(testEntity);
             var localUndo = entXformUndo.LocalPosition;
-            Assert.That(Math.Abs(localUndo.X - initialLocalPos.X) < 0.1f, Is.True,
+            Assert.That(Math.Abs(localUndo.X - initialLocalPos.X) < 0.1f,
+                Is.True,
                 $"Entity local X should be back at {initialLocalPos.X} after undo, got {localUndo.X}");
 
             // Selection is still at Box2i(2,2,4,4) — the fix ensures it was never moved.
-            Assert.That(tool.Selection!.Value, Is.EqualTo(new Box2i(2, 2, 4, 4)),
+            Assert.That(tool.Selection!.Value,
+                Is.EqualTo(new Box2i(2, 2, 4, 4)),
                 "Selection must still be at the original region after undo so the second move can start");
 
             // === Step 4: Second move — click the original region, drag (+1,0), release. ===
             // This is the regression scenario: before the fix, Selection would have been
             // at (5,2,7,4) (the post-move destination), so clicking (3,3) would fall
             // outside it and start a new drag instead of a move.
-            tool.OnMouseDown(ctx, new Vector2i(3, 3));  // must enter move mode, not drag mode
-            Assert.That(tool.IsMoving, Is.True,
+            tool.OnMouseDown(ctx,
+                new Vector2i(3, 3),
+                new EditorInput() { InputButton = EditorInputButton.Primary }); // must enter move mode, not drag mode
+            Assert.That(tool.IsMoving,
+                Is.True,
                 "REGRESSION: clicking original selection region after undo must enter move mode, " +
                 "not start a new drag — Selection must not have drifted to the destination");
 
-            tool.OnMouseDrag(ctx, new Vector2i(4, 3));  // delta = (+1, 0)
-            tool.OnMouseUp(ctx);                        // ApplyMove: source=(2,2,4,4), offset=(+1,0)
+            tool.OnMouseDrag(ctx,
+                new Vector2i(4, 3),
+                new EditorInput() { InputButton = EditorInputButton.Primary }); // delta = (+1, 0)
+            tool.OnMouseUp(ctx,
+                new EditorInput()
+                    { InputButton = EditorInputButton.Primary }); // ApplyMove: source=(2,2,4,4), offset=(+1,0)
 
             // Verify the second move was actually applied — tiles.
             var gcAfter2 = entManager.GetComponent<MapGridComponent>(gridUid);
             Assert.That(mapSystem.GetTileRef(gridUid, gcAfter2, new Vector2i(2, 2)).Tile.IsEmpty,
-                Is.True, "Source tile (2,2) should be empty after second move");
+                Is.True,
+                "Source tile (2,2) should be empty after second move");
             Assert.That(mapSystem.GetTileRef(gridUid, gcAfter2, new Vector2i(3, 2)).Tile.IsEmpty,
-                Is.False, "Destination tile (3,2) should be filled after second move");
+                Is.False,
+                "Destination tile (3,2) should be filled after second move");
 
             // Verify second move — entity local X should have moved by +1 from original.
             var entXformAfter2 = entManager.GetComponent<TransformComponent>(testEntity);
             var localAfter2 = entXformAfter2.LocalPosition;
-            Assert.That(Math.Abs(localAfter2.X - (initialLocalPos.X + 1)) < 0.1f, Is.True,
+            Assert.That(Math.Abs(localAfter2.X - (initialLocalPos.X + 1)) < 0.1f,
+                Is.True,
                 $"Entity local X should be {initialLocalPos.X + 1} after second move, got {localAfter2.X}");
         });
 

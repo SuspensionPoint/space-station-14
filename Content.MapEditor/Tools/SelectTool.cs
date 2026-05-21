@@ -57,7 +57,7 @@ public sealed class SelectTool : IEditorTool
     /// <summary>Current move offset from the original position, for ghost rendering.</summary>
     public Vector2i MoveOffset => _totalMoveOffset;
 
-    public void OnMouseDown(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         // If clicking inside an existing selection, enter move mode.
         if (Selection != null && Selection.Value.Contains(tilePos))
@@ -144,7 +144,7 @@ public sealed class SelectTool : IEditorTool
         _selectionEntitiesBox = null;
     }
 
-    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         if (_isMoving)
         {
@@ -162,7 +162,7 @@ public sealed class SelectTool : IEditorTool
         _dragEnd = tilePos;
     }
 
-    public void OnMouseUp(ToolContext ctx)
+    public void OnMouseUp(ToolContext ctx, EditorInput input)
     {
         if (_isMoving)
         {

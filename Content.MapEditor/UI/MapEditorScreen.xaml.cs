@@ -1036,6 +1036,48 @@ public sealed partial class MapEditorScreen : UIScreen
         }
     }
 
+    // private void RefreshStructureList(string filter)
+    // {
+    //     StructureListContainer.RemoveAllChildren();
+    //
+    //     foreach (var (display, protoId, icon, category) in _allEntityProtos)
+    //     {
+    //         if (!categoryGroups.TryGetValue(category, out var list))
+    //         {
+    //             list = new List<(string, string, Texture?)>();
+    //             categoryGroups[category] = list;
+    //         }
+    //         list.Add((display, protoId, icon));
+    //     }
+    //
+    //     foreach (var (categoryName, entities) in categoryGroups)
+    //     {
+    //         var body = new CollapsibleBody();
+    //         var itemList = new ItemList
+    //         {
+    //             HorizontalExpand = true,
+    //             MinHeight = Math.Min(entities.Count * 28 + 4, 300),
+    //         };
+    //         itemList.OnItemSelected += OnEntityItemSelected;
+    //
+    //         foreach (var (display, protoId, icon) in entities)
+    //         {
+    //             var iconScale = icon != null ? MathF.Min(1f, 24f / icon.Height) : 1f;
+    //             var item = itemList.AddItem(display, icon: icon, metadata: protoId, iconScale: iconScale);
+    //             item.TooltipText = protoId;
+    //         }
+    //
+    //         body.AddChild(itemList);
+    //
+    //         var heading = new CollapsibleHeading($"{categoryName} ({entities.Count})");
+    //         var collapsible = new Collapsible(heading, body);
+    //
+    //         _categorySections[categoryName] = (collapsible, itemList);
+    //         EntityListContainer.AddChild(collapsible);
+    //     }
+    // }
+
+
     private void OnEntityItemSelected(ItemList.ItemListSelectedEventArgs args)
     {
         var item = args.ItemList[args.ItemIndex];

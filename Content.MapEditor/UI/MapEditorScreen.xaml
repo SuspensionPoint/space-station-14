@@ -93,6 +93,13 @@
                                     <BoxContainer Name="EntityListContainer" Orientation="Vertical" HorizontalExpand="True" />
                                 </ScrollContainer>
                             </BoxContainer>
+                            <!-- Structures tab -->
+                            <BoxContainer Name="StructureTabContent" Orientation="Vertical" Margin="4">
+                                <LineEdit Name="StructureSearchEdit" HorizontalExpand="True" PlaceHolder="Search entities..." Margin="0 0 0 4" />
+                                <ScrollContainer Name="StructureScrollContainer" VerticalExpand="True" HorizontalExpand="True">
+                                    <BoxContainer Name="StructureListContainer" Orientation="Vertical" HorizontalExpand="True" />
+                                </ScrollContainer>
+                            </BoxContainer>
 
                         </TabContainer>
                     </PanelContainer>

@@ -19,6 +19,7 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
 using Content.Client.Power.Visualizers;
+using Content.Server.MapEditor;
 using Content.Shared.SubFloor;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
@@ -45,6 +46,7 @@ public sealed partial class MapEditorState : State
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefs = default!;
+    [Dependency] private readonly IComponentFactory _componentFactory = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     private ISawmill _sawmill = default!;
     private MapEditorScreen _screen = default!;
@@ -107,6 +109,10 @@ public sealed partial class MapEditorState : State
     // Infrastructure mode hides non-infrastructure entities and shows subfloor.
     private bool _infrastructureMode;
     private Dictionary<EntityUid, bool>? _savedVisibility;
+
+    // Editor Category List
+    public Dictionary<string, EditorCategory> EditorCategories { get; } = new();
+
 
     /// <summary>
     ///     Component types that remain visible during infrastructure mode.
@@ -208,6 +214,9 @@ public sealed partial class MapEditorState : State
         _selectionOutlineShader.SetParameter("outline_fullbright", true);
         _selectionOutlineShader.SetParameter("outline_width", 4.0f);
         _selectionOutlineShader.SetParameter("outline_color", new Color(0.1f, 1.0f, 0.3f, 0.8f));
+
+        // Build the Editor Palette Category Prototype tree.
+        BuildProtoIndex();
 
         // Set initial toolbar state.
         _screen.SetActiveToolButton(_activeToolKey);
@@ -426,4 +435,25 @@ public sealed partial class MapEditorState : State
     }
 
     #endregion
+
+    // Add Categories according to Metadata component.
+    private void BuildProtoIndex()
+    {
+        foreach (var proto in _prototypeManager.EnumeratePrototypes<EntityPrototype>())
+        {
+            if (proto.Components.TryGetComponent<EditorMetadataComponent>(_componentFactory, out var metadata))
+            {
+                if (string.IsNullOrEmpty(metadata.Category))
+                {
+                    if (!EditorCategories.ContainsKey(metadata.Category))
+                    {
+                        EditorCategories.Add(metadata.Category, new EditorCategory(metadata.Category));
+                    }
+
+                    var category = EditorCategories[metadata.Category];
+                    category.EntityPrototypes.Add(proto);
+                }
+            }
+        }
+    }
 }

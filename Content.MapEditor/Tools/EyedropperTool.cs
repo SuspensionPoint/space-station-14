@@ -10,7 +10,7 @@ public sealed class EyedropperTool : IEditorTool
 {
     public string Name => "Eyedropper";
 
-    public void OnMouseDown(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         var gridUid = ctx.ActiveGridUid;
         var grid = ctx.EntityManager.GetComponent<MapGridComponent>(gridUid);
@@ -18,12 +18,12 @@ public sealed class EyedropperTool : IEditorTool
         ctx.SelectedTile = tile;
     }
 
-    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         // No-op: eyedropper only picks on click.
     }
 
-    public void OnMouseUp(ToolContext ctx)
+    public void OnMouseUp(ToolContext ctx, EditorInput input)
     {
         // No-op.
     }

@@ -596,6 +596,9 @@
   - type: Construction
     graph: Girder
     node: reinforcedWall
+  - type: EditorMetadata
+    category: Walls
+    priority: 10
   - type: Damageable
     damageContainer: StructuralInorganic
     damageModifierSet: StructuralMetallicStrong
@@ -986,6 +989,9 @@
   - type: Construction
     graph: Girder
     node: wall
+  - type: EditorMetadata
+    category: Walls
+    priority: 9
   - type: Icon
     sprite: Structures/Walls/solid.rsi
   - type: RCDDeconstructable

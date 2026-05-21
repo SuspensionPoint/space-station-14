@@ -14,7 +14,7 @@ public sealed class EntityPlaceTool : IEditorTool
 {
     public string Name => "Entity Place";
 
-    public void OnMouseDown(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         if (string.IsNullOrEmpty(ctx.SelectedEntityPrototype))
             return;
@@ -50,6 +50,6 @@ public sealed class EntityPlaceTool : IEditorTool
         ctx.CommandStack.Push(cmd);
     }
 
-    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos) { }
-    public void OnMouseUp(ToolContext ctx) { }
+    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input) { }
+    public void OnMouseUp(ToolContext ctx, EditorInput input) { }
 }

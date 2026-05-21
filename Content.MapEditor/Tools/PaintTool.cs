@@ -15,21 +15,24 @@ public sealed class PaintTool : IEditorTool
     public string Name => "Paint";
 
     private BatchCommand? _batch;
-    private readonly HashSet<Vector2i> _paintedThisStroke = new();
 
-    public void OnMouseDown(ToolContext ctx, Vector2i tilePos)
+    private readonly HashSet<Vector2i> _paintedThisStroke = new();
+    private readonly HashSet<Vector2i> _erasedThisStroke = new();
+
+    public void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         _batch = new BatchCommand();
         _paintedThisStroke.Clear();
-        PaintTile(ctx, tilePos);
+        _erasedThisStroke.Clear();
+        DoInput(ctx, tilePos, input);
     }
 
-    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
-        PaintTile(ctx, tilePos);
+        DoInput(ctx, tilePos, input);
     }
 
-    public void OnMouseUp(ToolContext ctx)
+    public void OnMouseUp(ToolContext ctx, EditorInput input)
     {
         if (_batch != null && _batch.Count > 0)
         {
@@ -60,5 +63,39 @@ public sealed class PaintTool : IEditorTool
         var cmd = new SetTileCommand(ctx.MapSystem, gridUid, grid, pos, oldTile, ctx.GetVariantTile());
         cmd.Execute(); // Apply immediately for visual feedback.
         _batch.Add(cmd);
+    }
+    private void EraseTile(ToolContext ctx, Vector2i pos)
+    {
+        if (_batch == null)
+            return;
+
+        if (!_erasedThisStroke.Add(pos))
+            return;
+
+        var gridUid = ctx.ActiveGridUid;
+        var grid = ctx.EntityManager.GetComponent<MapGridComponent>(gridUid);
+        var oldTile = ctx.MapSystem.GetTileRef(gridUid, grid, pos).Tile;
+
+        if (oldTile.IsEmpty)
+            return; // Already empty.
+
+        var cmd = new SetTileCommand(ctx.MapSystem, gridUid, grid, pos, oldTile, Tile.Empty);
+        cmd.Execute();
+        _batch.Add(cmd);
+    }
+
+    private void DoInput(ToolContext ctx, Vector2i tilePos, EditorInput input)
+    {
+        switch (input.InputButton)
+        {
+            case EditorInputButton.Primary:
+                PaintTile(ctx, tilePos);
+                break;
+            case EditorInputButton.Secondary:
+                EraseTile(ctx, tilePos);
+                break;
+            default:
+                return;
+        }
     }
 }
