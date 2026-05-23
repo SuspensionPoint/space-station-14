@@ -151,8 +151,8 @@ public sealed partial class MapEditorState
             case "circle":
             {
                 // Show selected tile texture.
-                var tileId = _toolContext.SelectedTile.TypeId;
-                if (tileId > 0 && _tileDefs.TryGetDefinition(tileId, out var tileDef) && tileDef.Sprite != null)
+                var tileId = _toolContext.SelectedPaintTarget.Tile.TypeId;
+                if (tileId is > 0 && _tileDefs.TryGetDefinition(tileId, out var tileDef) && tileDef.Sprite != null)
                 {
                     var resourceCache = IoCManager.Resolve<Robust.Client.ResourceManagement.IResourceCache>();
                     var spritePath = tileDef.Sprite.ToString();

@@ -49,7 +49,11 @@ public sealed class TileToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid,
-                SelectedTile = new Tile(2, 0, 0), // Paint with tile type 2.
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(2, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var paintTool = new PaintTool();
@@ -114,7 +118,11 @@ public sealed class TileToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid,
-                SelectedTile = new Tile(3, 0, 0),
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(3, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var paintTool = new PaintTool();
@@ -233,7 +241,11 @@ public sealed class TileToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid2,
-                SelectedTile = new Tile(5, 0, 0),
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(5, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var paintTool = new PaintTool();

@@ -48,7 +48,11 @@ public sealed class FillToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid,
-                SelectedTile = new Tile(2, 0, 0), // Fill with tile type 2.
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(2, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var fillTool = new FillTool();
@@ -112,7 +116,11 @@ public sealed class FillToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid,
-                SelectedTile = new Tile(2, 0, 0),
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(2, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var fillTool = new FillTool();

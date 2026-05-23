@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using Content.MapEditor.Commands;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
@@ -57,13 +59,14 @@ public sealed class PaintTool : IEditorTool
         var grid = ctx.EntityManager.GetComponent<MapGridComponent>(gridUid);
         var oldTile = ctx.MapSystem.GetTileRef(gridUid, grid, pos).Tile;
 
-        if (oldTile.TypeId == ctx.SelectedTile.TypeId)
+        if (oldTile.TypeId == ctx.SelectedPaintTarget.Tile.TypeId)
             return; // No change needed (same type, keep existing variant).
 
         var cmd = new SetTileCommand(ctx.MapSystem, gridUid, grid, pos, oldTile, ctx.GetVariantTile());
         cmd.Execute(); // Apply immediately for visual feedback.
         _batch.Add(cmd);
     }
+
     private void EraseTile(ToolContext ctx, Vector2i pos)
     {
         if (_batch == null)
@@ -84,18 +87,98 @@ public sealed class PaintTool : IEditorTool
         _batch.Add(cmd);
     }
 
+    private void PaintEntity(ToolContext ctx, Vector2i pos)
+    {
+        if (_batch == null)
+            return;
+
+        if (!_paintedThisStroke.Add(pos))
+            return;
+
+        var gridUid = ctx.ActiveGridUid;
+        var grid = ctx.EntityManager.GetComponent<MapGridComponent>(gridUid);
+
+        var coords = ctx.MapSystem.GridTileToLocal(
+            gridUid,
+            grid,
+            pos);
+
+        var uid = ctx.EntityManager.SpawnEntity(ctx.SelectedPaintTarget.EntityPrototype, coords);
+
+        var cmd = new SpawnEntityCommand(
+            ctx.EntityManager,
+            uid);
+
+        cmd.Execute();
+
+        _batch.Add(cmd);
+    }
+
+    private void EraseEntity(ToolContext ctx, Vector2i pos)
+    {
+        if (_batch == null)
+            return;
+        if (!_erasedThisStroke.Add(pos))
+            return;
+
+        var lookup = ctx.EntityManager.System<EntityLookupSystem>();
+
+        var coords = new EntityCoordinates(
+            ctx.ActiveGridUid,
+            pos.X + 0.5f,
+            pos.Y + 0.5f);
+
+        var entities = lookup.GetEntitiesIntersecting(coords);
+
+        foreach (var entity in entities)
+        {
+            if(entity == ctx.ActiveGridUid) continue;
+
+            var cmd = new DeleteEntityCommand(ctx.EntityManager, entity);
+
+            cmd.Execute();
+            _batch.Add(cmd);
+        }
+    }
+
     private void DoInput(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         switch (input.InputButton)
         {
             case EditorInputButton.Primary:
-                PaintTile(ctx, tilePos);
+                PaintThing(ctx, tilePos);
                 break;
             case EditorInputButton.Secondary:
-                EraseTile(ctx, tilePos);
+                EraseThing(ctx, tilePos);
                 break;
             default:
                 return;
+        }
+    }
+
+    private void PaintThing(ToolContext ctx, Vector2i tilePos)
+    {
+        switch (ctx.SelectedPaintTarget.Type)
+        {
+            case PaintTargetType.Tile:
+                PaintTile(ctx, tilePos);
+                break;
+            case PaintTargetType.Entity:
+                PaintEntity(ctx, tilePos);
+                break;
+        }
+    }
+
+    private void EraseThing(ToolContext ctx, Vector2i tilePos)
+    {
+        switch (ctx.SelectedPaintTarget.Type)
+        {
+            case PaintTargetType.Tile:
+                EraseTile(ctx, tilePos);
+                break;
+            case PaintTargetType.Entity:
+                EraseEntity(ctx, tilePos);
+                break;
         }
     }
 }

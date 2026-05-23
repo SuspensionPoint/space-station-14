@@ -110,10 +110,6 @@ public sealed partial class MapEditorState : State
     private bool _infrastructureMode;
     private Dictionary<EntityUid, bool>? _savedVisibility;
 
-    // Editor Category List
-    public Dictionary<string, EditorCategory> EditorCategories { get; } = new();
-
-
     /// <summary>
     ///     Component types that remain visible during infrastructure mode.
     ///     Entities with any of these components are considered "infrastructure".
@@ -203,6 +199,9 @@ public sealed partial class MapEditorState : State
         // Populate the entity palette.
         _screen.PopulateEntityPalette(_prototypeManager);
 
+        _screen.BuildProtoIndex();
+        _screen.RefreshStructureList();
+
         // Register hover highlight overlay.
         _editorOverlay = new EditorOverlay();
         IoCManager.Resolve<IOverlayManager>().AddOverlay(_editorOverlay);
@@ -215,8 +214,6 @@ public sealed partial class MapEditorState : State
         _selectionOutlineShader.SetParameter("outline_width", 4.0f);
         _selectionOutlineShader.SetParameter("outline_color", new Color(0.1f, 1.0f, 0.3f, 0.8f));
 
-        // Build the Editor Palette Category Prototype tree.
-        BuildProtoIndex();
 
         // Set initial toolbar state.
         _screen.SetActiveToolButton(_activeToolKey);
@@ -435,25 +432,4 @@ public sealed partial class MapEditorState : State
     }
 
     #endregion
-
-    // Add Categories according to Metadata component.
-    private void BuildProtoIndex()
-    {
-        foreach (var proto in _prototypeManager.EnumeratePrototypes<EntityPrototype>())
-        {
-            if (proto.Components.TryGetComponent<EditorMetadataComponent>(_componentFactory, out var metadata))
-            {
-                if (string.IsNullOrEmpty(metadata.Category))
-                {
-                    if (!EditorCategories.ContainsKey(metadata.Category))
-                    {
-                        EditorCategories.Add(metadata.Category, new EditorCategory(metadata.Category));
-                    }
-
-                    var category = EditorCategories[metadata.Category];
-                    category.EntityPrototypes.Add(proto);
-                }
-            }
-        }
-    }
 }

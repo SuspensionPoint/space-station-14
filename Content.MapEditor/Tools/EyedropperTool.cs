@@ -15,7 +15,11 @@ public sealed class EyedropperTool : IEditorTool
         var gridUid = ctx.ActiveGridUid;
         var grid = ctx.EntityManager.GetComponent<MapGridComponent>(gridUid);
         var tile = ctx.MapSystem.GetTileRef(gridUid, grid, tilePos).Tile;
-        ctx.SelectedTile = tile;
+        ctx.SelectedPaintTarget = new PaintTarget()
+        {
+            Tile = tile,
+            Type = PaintTargetType.Tile,
+        };
     }
 
     public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input)

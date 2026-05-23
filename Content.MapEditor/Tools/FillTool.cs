@@ -27,7 +27,7 @@ public sealed class FillTool : IEditorTool
 
         // If the origin tile is already the selected tile type, nothing to do.
         // Compare only TypeId so that different variants/flags don't block the fill.
-        if (originTile.TypeId == ctx.SelectedTile.TypeId)
+        if (originTile.TypeId == ctx.SelectedPaintTarget.Tile.TypeId)
             return;
 
         var batch = new BatchCommand();

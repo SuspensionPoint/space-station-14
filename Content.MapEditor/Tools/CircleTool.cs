@@ -61,7 +61,7 @@ public sealed class CircleTool : IEditorTool
                 var pos = new Vector2i(x, y);
                 var oldTile = ctx.MapSystem.GetTileRef(gridUid, grid, pos).Tile;
 
-                if (oldTile.TypeId == ctx.SelectedTile.TypeId)
+                if (oldTile.TypeId == ctx.SelectedPaintTarget.Tile.TypeId)
                     continue;
 
                 var cmd = new SetTileCommand(ctx.MapSystem, gridUid, grid, pos, oldTile, ctx.GetVariantTile());

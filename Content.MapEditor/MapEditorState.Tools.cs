@@ -133,10 +133,9 @@ public sealed partial class MapEditorState
         }
     }
 
-    private void OnTileSelected(int tileId)
+    private void OnTileSelected(PaintTarget paintTarget)
     {
-        _toolContext.SelectedTile = new Tile(tileId);
-
+        _toolContext.SelectedPaintTarget = paintTarget;
         // Only auto-switch to paint if the current tool isn't already tile-based.
         var isTileTool = _activeToolKey is "paint"
             or "erase"
@@ -219,15 +218,6 @@ public sealed partial class MapEditorState
         return mods;
     }
 
-    private EditorInputButton GetInputButtons()
-    {
-        if(_input.IsKeyDown(Keyboard.Key.MouseLeft))
-            return EditorInputButton.Primary;
-        if (_input.IsKeyDown(Keyboard.Key.MouseRight))
-            return EditorInputButton.Secondary;
-        return EditorInputButton.None;
-    }
-
     private void UpdateButton(EditorInput input)
     {
         var inputDown = input.InputButton != EditorInputButton.None;
@@ -255,7 +245,7 @@ public sealed partial class MapEditorState
                     _cablesDirty = true;
 
                 if (_activeToolKey == "eyedropper")
-                    _screen.SelectTileInPalette(_toolContext.SelectedTile.TypeId);
+                    _screen.SelectTileInPalette(_toolContext.SelectedPaintTarget.Tile.TypeId);
             }
         }
         else if (inputDown && _isToolActive)
@@ -403,8 +393,6 @@ public enum EditorInputButton
     None,
     Primary,
     Secondary,
-    ModifiedPrimary,
-    ModifiedSecondary,
 }
 
 [Flags]
