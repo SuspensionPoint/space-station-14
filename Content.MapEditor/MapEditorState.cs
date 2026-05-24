@@ -19,7 +19,6 @@ using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Maths;
 using Content.Client.Power.Visualizers;
-using Content.Server.MapEditor;
 using Content.Shared.SubFloor;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
