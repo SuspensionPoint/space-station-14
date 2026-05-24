@@ -1,6 +1,6 @@
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.MapEditor;
+namespace Content.Shared.MapEditor;
 
 [Prototype("editorCategory")]
 public sealed partial class EditorCategoryDefinition : IPrototype
