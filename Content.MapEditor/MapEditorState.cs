@@ -45,6 +45,7 @@ public sealed partial class MapEditorState : State
     [Dependency] private readonly IEntityManager _entityManager = default!;
     [Dependency] private readonly IMapManager _mapManager = default!;
     [Dependency] private readonly ITileDefinitionManager _tileDefs = default!;
+    [Dependency] private readonly IComponentFactory _componentFactory = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     private ISawmill _sawmill = default!;
     private MapEditorScreen _screen = default!;
@@ -197,6 +198,9 @@ public sealed partial class MapEditorState : State
         // Populate the entity palette.
         _screen.PopulateEntityPalette(_prototypeManager);
 
+        _screen.BuildProtoIndex();
+        _screen.RefreshStructureList();
+
         // Register hover highlight overlay.
         _editorOverlay = new EditorOverlay();
         IoCManager.Resolve<IOverlayManager>().AddOverlay(_editorOverlay);
@@ -208,6 +212,7 @@ public sealed partial class MapEditorState : State
         _selectionOutlineShader.SetParameter("outline_fullbright", true);
         _selectionOutlineShader.SetParameter("outline_width", 4.0f);
         _selectionOutlineShader.SetParameter("outline_color", new Color(0.1f, 1.0f, 0.3f, 0.8f));
+
 
         // Set initial toolbar state.
         _screen.SetActiveToolButton(_activeToolKey);

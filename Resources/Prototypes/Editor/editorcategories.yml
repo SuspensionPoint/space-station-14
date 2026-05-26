@@ -1,0 +1,42 @@
+- type: editorCategory
+  id: Walls
+  name: Walls
+  priority: 10
+  entries:
+    - WallSolid
+    - WallReinforced
+    - Window
+    - TintedWindow
+    - WindowDirectional
+- type: editorCategory
+  id: Machines
+  name: Machines
+  priority: 10
+  entries:
+  - APC
+  - AirAlarm
+  - GasVentScrubber
+  - GasPassiveVent
+  - GasVentPump
+- type: editorCategory
+  id: Furniture
+  name: Furniture
+  priority: 11
+  entries:
+  - Table
+  - TableReinforced
+  - TableGlass
+  - TableWood
+  - Chair
+  - ChairWood
+  - ChairOffice
+
+- type: editorCategory
+  id: Airlocks
+  name: Airlocks
+  priority: 12
+  entries:
+  - Airlock
+  - AirlockGlass
+  - Firelock
+

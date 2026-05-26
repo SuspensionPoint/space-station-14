@@ -95,7 +95,7 @@ public sealed class EntitySelectTool : IEditorTool
     private EntityCoordinates _dragStartCoords;
     private EntityCoordinates? _freeDragCoords;
 
-    public void OnMouseDown(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         // Clear any stale pending pick.
         PendingPick = null;
@@ -225,7 +225,7 @@ public sealed class EntitySelectTool : IEditorTool
         PendingPickTilePos = null;
     }
 
-    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         if (!IsDragging || SelectedEntity == null || !ctx.EntityManager.EntityExists(SelectedEntity.Value))
             return;
@@ -259,7 +259,7 @@ public sealed class EntitySelectTool : IEditorTool
         SelectedTilePos = tilePos;
     }
 
-    public void OnMouseUp(ToolContext ctx)
+    public void OnMouseUp(ToolContext ctx, EditorInput input)
     {
         if (!IsDragging || SelectedEntity == null)
         {

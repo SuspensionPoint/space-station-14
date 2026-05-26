@@ -16,15 +16,18 @@ public sealed class FillTool : IEditorTool
 
     private const int MaxFillTiles = 500;
 
-    public void OnMouseDown(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
+        if (input.InputButton != EditorInputButton.Primary)
+            return;
+
         var gridUid = ctx.ActiveGridUid;
         var grid = ctx.EntityManager.GetComponent<MapGridComponent>(gridUid);
         var originTile = ctx.MapSystem.GetTileRef(gridUid, grid, tilePos).Tile;
 
         // If the origin tile is already the selected tile type, nothing to do.
         // Compare only TypeId so that different variants/flags don't block the fill.
-        if (originTile.TypeId == ctx.SelectedTile.TypeId)
+        if (originTile.TypeId == ctx.SelectedPaintTarget.Tile.TypeId)
             return;
 
         var batch = new BatchCommand();
@@ -57,12 +60,12 @@ public sealed class FillTool : IEditorTool
             ctx.CommandStack.Push(batch);
     }
 
-    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         // No-op: fill is a single-click operation.
     }
 
-    public void OnMouseUp(ToolContext ctx)
+    public void OnMouseUp(ToolContext ctx, EditorInput input)
     {
         // No-op.
     }

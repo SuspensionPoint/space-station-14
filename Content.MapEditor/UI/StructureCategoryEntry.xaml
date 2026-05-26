@@ -1,0 +1,10 @@
+<PanelContainer xmlns="https://spacestation14.io" HorizontalExpand="True" StyleClasses="PanelDark" Margin="4"
+    xmlns:editor="clr-namespace:Content.MapEditor.UI"
+    xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls;assembly=Content.Client"
+    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client">
+    <BoxContainer Margin="4" HorizontalExpand="True" Orientation="Vertical">
+        <Label Text="Unset" Name="CategoryName" MinHeight="20" MinWidth="20" Margin="0 0 0 4"/>
+        <BoxContainer Orientation="Vertical" Name="EntriesHolder" Access="Public" HorizontalExpand="True" SeparationOverride="4"/>
+    </BoxContainer>
+
+</PanelContainer>

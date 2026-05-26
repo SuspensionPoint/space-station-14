@@ -9,7 +9,7 @@ namespace Content.MapEditor.Tools;
 public interface IEditorTool
 {
     string Name { get; }
-    void OnMouseDown(ToolContext ctx, Vector2i tilePos);
-    void OnMouseDrag(ToolContext ctx, Vector2i tilePos);
-    void OnMouseUp(ToolContext ctx);
+    void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input);
+    void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input);
+    void OnMouseUp(ToolContext ctx, EditorInput input);
 }

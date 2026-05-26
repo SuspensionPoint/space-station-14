@@ -1,5 +1,6 @@
 using Content.IntegrationTests.Fixtures;
 using Content.IntegrationTests.Fixtures.Attributes;
+using Content.MapEditor;
 using Content.MapEditor.Commands;
 using Content.MapEditor.Tools;
 using Content.Shared.CCVar;
@@ -47,13 +48,17 @@ public sealed class FillToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid,
-                SelectedTile = new Tile(2, 0, 0), // Fill with tile type 2.
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(2, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var fillTool = new FillTool();
 
             // Fill starting from (0, 0) — should fill all 3 tiles since they share TypeId 1.
-            fillTool.OnMouseDown(ctx, new Vector2i(0, 0));
+            fillTool.OnMouseDown(ctx, new Vector2i(0, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             for (var x = 0; x < 3; x++)
             {
@@ -111,11 +116,15 @@ public sealed class FillToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid,
-                SelectedTile = new Tile(2, 0, 0),
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(2, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var fillTool = new FillTool();
-            fillTool.OnMouseDown(ctx, new Vector2i(0, 0));
+            fillTool.OnMouseDown(ctx, new Vector2i(0, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             // (0,0) and (1,0) should be filled.
             Assert.That(mapSystem.GetTileRef(grid, gridComp, new Vector2i(0, 0)).Tile.TypeId, Is.EqualTo(2));

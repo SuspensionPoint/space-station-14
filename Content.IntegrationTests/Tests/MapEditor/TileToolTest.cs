@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Content.IntegrationTests.Fixtures;
 using Content.IntegrationTests.Fixtures.Attributes;
+using Content.MapEditor;
 using Content.MapEditor.Commands;
 using Content.MapEditor.Tools;
 using Content.Shared.CCVar;
@@ -48,14 +49,18 @@ public sealed class TileToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid,
-                SelectedTile = new Tile(2, 0, 0), // Paint with tile type 2.
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(2, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var paintTool = new PaintTool();
 
             // Paint at (3, 3) — should change tile from type 1 to type 2.
-            paintTool.OnMouseDown(ctx, new Vector2i(3, 3));
-            paintTool.OnMouseUp(ctx);
+            paintTool.OnMouseDown(ctx, new Vector2i(3, 3), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            paintTool.OnMouseUp(ctx, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             // Verify the tile was changed.
             var tileRef = mapSystem.GetTileRef(grid, gridComp, new Vector2i(3, 3));
@@ -113,16 +118,20 @@ public sealed class TileToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid,
-                SelectedTile = new Tile(3, 0, 0),
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(3, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var paintTool = new PaintTool();
 
             // Simulate a drag stroke across three tiles.
-            paintTool.OnMouseDown(ctx, new Vector2i(0, 0));
-            paintTool.OnMouseDrag(ctx, new Vector2i(1, 0));
-            paintTool.OnMouseDrag(ctx, new Vector2i(2, 0));
-            paintTool.OnMouseUp(ctx);
+            paintTool.OnMouseDown(ctx, new Vector2i(0, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            paintTool.OnMouseDrag(ctx, new Vector2i(1, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            paintTool.OnMouseDrag(ctx, new Vector2i(2, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            paintTool.OnMouseUp(ctx, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             // All three tiles should be type 3.
             for (var x = 0; x < 3; x++)
@@ -178,8 +187,8 @@ public sealed class TileToolTest : GameTest
 
             var eraseTool = new EraseTool();
 
-            eraseTool.OnMouseDown(ctx, new Vector2i(5, 5));
-            eraseTool.OnMouseUp(ctx);
+            eraseTool.OnMouseDown(ctx, new Vector2i(5, 5), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            eraseTool.OnMouseUp(ctx, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             var tileRef = mapSystem.GetTileRef(grid, gridComp, new Vector2i(5, 5));
             Assert.That(tileRef.Tile.IsEmpty, Is.True,
@@ -232,12 +241,16 @@ public sealed class TileToolTest : GameTest
                 CommandStack = commandStack,
                 TileDefinitionManager = server.ResolveDependency<ITileDefinitionManager>(),
                 ActiveGridUid = grid2,
-                SelectedTile = new Tile(5, 0, 0),
+                SelectedPaintTarget = new PaintTarget()
+                {
+                    Tile = new Tile(5, 0, 0),
+                    Type = PaintTargetType.Tile,
+                },
             };
 
             var paintTool = new PaintTool();
-            paintTool.OnMouseDown(ctx, new Vector2i(0, 0));
-            paintTool.OnMouseUp(ctx);
+            paintTool.OnMouseDown(ctx, new Vector2i(0, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            paintTool.OnMouseUp(ctx, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             // Grid2 should be painted.
             var tile2 = mapSystem.GetTileRef(grid2, grid2Comp, new Vector2i(0, 0));

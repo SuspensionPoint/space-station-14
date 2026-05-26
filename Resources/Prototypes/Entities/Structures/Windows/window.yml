@@ -86,6 +86,9 @@
   - type: Construction
     graph: Window
     node: window
+  - type: EditorMetadata
+    category: Walls
+    priority: 9
   - type: Appearance
   - type: DamageVisuals
     thresholds: [5, 10, 20]

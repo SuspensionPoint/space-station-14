@@ -1,7 +1,7 @@
 <editor:MapEditorScreen xmlns="https://spacestation14.io"
-    xmlns:editor="clr-namespace:Content.MapEditor.UI"
-    xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls;assembly=Content.Client"
-    xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client">
+                        xmlns:editor="clr-namespace:Content.MapEditor.UI"
+                        xmlns:controls="clr-namespace:Content.Client.UserInterface.Controls;assembly=Content.Client"
+                        xmlns:graphics="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client">
 
     <LayoutContainer Name="RootLayout" HorizontalExpand="True" VerticalExpand="True">
         <BoxContainer Name="MainLayout" Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
@@ -55,11 +55,20 @@
                         <PanelContainer.PanelOverride>
                             <graphics:StyleBoxFlat BackgroundColor="#1E2E1EDD" />
                         </PanelContainer.PanelOverride>
-                        <BoxContainer Orientation="Vertical" HorizontalAlignment="Center" Margin="4">
-                            <TextureRect Name="PreviewTexture" MinWidth="96" MinHeight="96"
-                                         HorizontalAlignment="Center" Stretch="KeepAspectCentered" />
-                            <Label Name="PreviewLabel" Text="" HorizontalAlignment="Center"
-                                   Margin="0 2 0 0" />
+                        <BoxContainer Orientation="Horizontal">
+                            <BoxContainer Orientation="Vertical" HorizontalAlignment="Center" Margin="4">
+                                <TextureRect Name="PreviewTexture" MinWidth="96" MinHeight="96"
+                                             HorizontalAlignment="Center" Stretch="KeepAspectCentered" />
+                                <Label Name="PreviewLabel" Text="" HorizontalAlignment="Center"
+                                       Margin="0 2 0 0" />
+                            </BoxContainer>
+
+                            <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
+                                <Button Text="North" Name="NorthButton" />
+                                <Button Text="South" Name="SouthButton"/>
+                                <Button Text="East" Name="EastButton"/>
+                                <Button Text="West" Name="WestButton"/>
+                            </BoxContainer>
                         </BoxContainer>
                     </PanelContainer>
 
@@ -80,7 +89,8 @@
 
                             <!-- Tiles tab -->
                             <BoxContainer Name="TileTabContent" Orientation="Vertical" Margin="4">
-                                <LineEdit Name="TileSearchEdit" HorizontalExpand="True" PlaceHolder="Search tiles..." Margin="0 0 0 4" />
+                                <LineEdit Name="TileSearchEdit" HorizontalExpand="True" PlaceHolder="Search tiles..."
+                                          Margin="0 0 0 4" />
                                 <ScrollContainer VerticalExpand="True" HorizontalExpand="True" HScrollEnabled="False">
                                     <GridContainer Name="TileGrid" HorizontalExpand="True" Columns="7" />
                                 </ScrollContainer>
@@ -88,9 +98,22 @@
 
                             <!-- Entities tab -->
                             <BoxContainer Name="EntityTabContent" Orientation="Vertical" Margin="4">
-                                <LineEdit Name="EntitySearchEdit" HorizontalExpand="True" PlaceHolder="Search entities..." Margin="0 0 0 4" />
-                                <ScrollContainer Name="EntityScrollContainer" VerticalExpand="True" HorizontalExpand="True">
-                                    <BoxContainer Name="EntityListContainer" Orientation="Vertical" HorizontalExpand="True" />
+                                <LineEdit Name="EntitySearchEdit" HorizontalExpand="True"
+                                          PlaceHolder="Search entities..." Margin="0 0 0 4" />
+                                <ScrollContainer Name="EntityScrollContainer" VerticalExpand="True"
+                                                 HorizontalExpand="True">
+                                    <BoxContainer Name="EntityListContainer" Orientation="Vertical"
+                                                  HorizontalExpand="True" />
+                                </ScrollContainer>
+                            </BoxContainer>
+                            <!-- Structures tab -->
+                            <BoxContainer Name="StructureTabContent" Orientation="Vertical" Margin="4">
+                                <LineEdit Name="StructureSearchEdit" HorizontalExpand="True"
+                                          PlaceHolder="Search entities..." Margin="0 0 0 4" />
+                                <ScrollContainer Name="StructureScrollContainer" VerticalExpand="True"
+                                                 HorizontalExpand="True">
+                                    <BoxContainer Name="StructureListContainer" Orientation="Vertical"
+                                                  HorizontalExpand="True" />
                                 </ScrollContainer>
                             </BoxContainer>
 

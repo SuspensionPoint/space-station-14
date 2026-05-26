@@ -27,7 +27,7 @@ public sealed class ToolContext
     /// <summary>
     ///     The tile type to paint with. Set by the tile palette.
     /// </summary>
-    public Tile SelectedTile { get; set; }
+    public PaintTarget SelectedPaintTarget { get; set; }
 
     /// <summary>
     ///     Clipboard data for copy/paste operations. Shared across tool instances.
@@ -74,17 +74,17 @@ public sealed class ToolContext
     public bool ShiftHeld { get; set; }
 
     /// <summary>
-    ///     Returns a copy of <see cref="SelectedTile"/> with a random variant chosen
+    ///     Returns a copy of <see cref="SelectedPaintTarget"/> with a random variant chosen
     ///     using the tile definition's <see cref="ContentTileDefinition.PlacementVariants"/> weights.
     /// </summary>
     public Tile GetVariantTile()
     {
-        var tileId = SelectedTile.TypeId;
+        var tileId = SelectedPaintTarget.Tile.TypeId;
         if (tileId <= 0 || !TileDefinitionManager.TryGetDefinition(tileId, out var def))
-            return SelectedTile;
+            return SelectedPaintTarget.Tile;
 
         if (def is not ContentTileDefinition contentDef || contentDef.Variants <= 1)
-            return SelectedTile;
+            return SelectedPaintTarget.Tile;
 
         var variant = PickVariant(contentDef);
         return new Tile(tileId, variant: variant);

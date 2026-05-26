@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Content.MapEditor.Tools;
 using Robust.Client.GameObjects;
@@ -20,7 +21,7 @@ public sealed partial class MapEditorState
         // End any in-progress stroke before switching.
         if (_isToolActive)
         {
-            _activeTool.OnMouseUp(_toolContext);
+            _activeTool.OnMouseUp(_toolContext, new EditorInput(){ InputButton =  EditorInputButton.Primary });
             _isToolActive = false;
         }
 
@@ -132,13 +133,17 @@ public sealed partial class MapEditorState
         }
     }
 
-    private void OnTileSelected(int tileId)
+    private void OnTileSelected(PaintTarget paintTarget)
     {
-        _toolContext.SelectedTile = new Tile(tileId);
-
+        _toolContext.SelectedPaintTarget = paintTarget;
         // Only auto-switch to paint if the current tool isn't already tile-based.
-        var isTileTool = _activeToolKey is "paint" or "erase" or "eyedropper" or "fill"
-            or "rectangle" or "line" or "circle";
+        var isTileTool = _activeToolKey is "paint"
+            or "erase"
+            or "eyedropper"
+            or "fill"
+            or "rectangle"
+            or "line"
+            or "circle";
         if (!isTileTool)
         {
             SetActiveTool(new PaintTool(), "paint");
@@ -180,31 +185,70 @@ public sealed partial class MapEditorState
     /// </summary>
     private void UpdateToolInput()
     {
-        var leftDown = _input.IsKeyDown(Keyboard.Key.MouseLeft);
+        var input = new EditorInput();
+        // If Left + Right, Left wins.
+        if (_input.IsKeyDown(Keyboard.Key.MouseLeft))
+        {
+            input.InputButton = EditorInputButton.Primary;
+        }
+        else if (_input.IsKeyDown(Keyboard.Key.MouseRight))
+        {
+            input.InputButton = EditorInputButton.Secondary;
+        }
+
+        input.InputModifiers = GetModifiers();
+
+        // TODO: Refactor to a config table.
+        UpdateButton(input);
+    }
+
+    private EditorInputModifiers GetModifiers()
+    {
+        var mods = EditorInputModifiers.None;
+
+        if (_input.IsKeyDown(Keyboard.Key.Shift))
+            mods |= EditorInputModifiers.Shift;
+
+        if (_input.IsKeyDown(Keyboard.Key.Control))
+            mods |= EditorInputModifiers.Ctrl;
+
+        if (_input.IsKeyDown(Keyboard.Key.Alt))
+            mods |= EditorInputModifiers.Alt;
+
+        return mods;
+    }
+
+    private void UpdateButton(EditorInput input)
+    {
+        var inputDown = input.InputButton != EditorInputButton.None;
         var screenPos = _input.MouseScreenPosition;
 
-        if (leftDown && !_wasLeftDown)
+        if (inputDown && !_wasLeftDown)
         {
             // Only start a tool stroke if the click is on the viewport, not on UI panels.
             if (!_isPanning && IsMouseOverViewport(screenPos) && TryResolveGridTile(screenPos, out var tilePos))
             {
                 var worldCoords = _eyeManager.PixelToMap(screenPos.Position);
                 _toolContext.CursorWorldPosition = worldCoords.Position;
-                _toolContext.ShiftHeld = _input.IsKeyDown(Keyboard.Key.Shift);
+
 
                 _isToolActive = true;
                 _lastToolTilePos = tilePos;
-                _activeTool.OnMouseDown(_toolContext, tilePos);
+
+                _activeTool.OnMouseDown(_toolContext,
+                    tilePos,
+                    input
+                    );
 
                 // Mark cables dirty if we placed an entity, cable, or pipe.
                 if (_activeToolKey is "entityplace" or "cabledraw" or "pipedraw")
                     _cablesDirty = true;
 
                 if (_activeToolKey == "eyedropper")
-                    _screen.SelectTileInPalette(_toolContext.SelectedTile.TypeId);
+                    _screen.SelectTileInPalette(_toolContext.SelectedPaintTarget.Tile.TypeId);
             }
         }
-        else if (leftDown && _isToolActive)
+        else if (inputDown && _isToolActive)
         {
             // Update cursor context for free placement during drag.
             var dragWorldCoords = _eyeManager.PixelToMap(screenPos.Position);
@@ -218,19 +262,19 @@ public sealed partial class MapEditorState
                 if (tilePos != _lastToolTilePos || _toolContext.ShiftHeld)
                 {
                     _lastToolTilePos = tilePos;
-                    _activeTool.OnMouseDrag(_toolContext, tilePos);
+                    _activeTool.OnMouseDrag(_toolContext, tilePos, input);
                 }
             }
         }
-        else if (!leftDown && _isToolActive)
+        else if (!inputDown && _isToolActive)
         {
             // Left mouse released, end stroke.
             _isToolActive = false;
-            _activeTool.OnMouseUp(_toolContext);
+            _activeTool.OnMouseUp(_toolContext, new EditorInput(){ InputButton =  EditorInputButton.Primary });
             _cablesDirty = true; // Recompute cable connections after any tool stroke.
         }
 
-        _wasLeftDown = leftDown;
+        _wasLeftDown = inputDown;
     }
 
     /// <summary>
@@ -240,7 +284,7 @@ public sealed partial class MapEditorState
     {
         var viewport = _screen.MainViewport;
         var vpRect = viewport.GlobalPixelRect;
-        if (!vpRect.Contains((int) screenPos.Position.X, (int) screenPos.Position.Y))
+        if (!vpRect.Contains((int)screenPos.Position.X, (int)screenPos.Position.Y))
             return false;
 
         // Check that no popup/menu is currently open on top of the viewport.
@@ -342,4 +386,26 @@ public sealed partial class MapEditorState
         _commandStack.Redo();
         _cablesDirty = true;
     }
+}
+
+public enum EditorInputButton
+{
+    None,
+    Primary,
+    Secondary,
+}
+
+[Flags]
+public enum EditorInputModifiers
+{
+    None  = 0,
+    Shift = 1 << 0,
+    Ctrl  = 1 << 1,
+    Alt   = 1 << 2,
+}
+
+public struct EditorInput
+{
+    public EditorInputButton InputButton;
+    public EditorInputModifiers InputModifiers;
 }

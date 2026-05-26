@@ -18,19 +18,19 @@ public sealed class PipeDrawTool : IEditorTool
     private BatchCommand? _batch;
     private readonly HashSet<Vector2i> _placedThisStroke = new();
 
-    public void OnMouseDown(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         _batch = new BatchCommand();
         _placedThisStroke.Clear();
         PlacePipe(ctx, tilePos);
     }
 
-    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         PlacePipe(ctx, tilePos);
     }
 
-    public void OnMouseUp(ToolContext ctx)
+    public void OnMouseUp(ToolContext ctx, EditorInput input)
     {
         if (_batch != null && _batch.Count > 0)
             ctx.CommandStack.Push(_batch);

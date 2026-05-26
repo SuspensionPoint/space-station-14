@@ -20,18 +20,18 @@ public sealed class RectangleTool : IEditorTool
     /// <summary>Current end corner of the drag, exposed for overlay preview.</summary>
     public Vector2i? DragEnd { get; private set; }
 
-    public void OnMouseDown(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDown(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         DragStart = tilePos;
         DragEnd = tilePos;
     }
 
-    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos)
+    public void OnMouseDrag(ToolContext ctx, Vector2i tilePos, EditorInput input)
     {
         DragEnd = tilePos;
     }
 
-    public void OnMouseUp(ToolContext ctx)
+    public void OnMouseUp(ToolContext ctx, EditorInput input)
     {
         if (DragStart == null || DragEnd == null)
             return;
@@ -55,7 +55,7 @@ public sealed class RectangleTool : IEditorTool
                 var pos = new Vector2i(x, y);
                 var oldTile = ctx.MapSystem.GetTileRef(gridUid, grid, pos).Tile;
 
-                if (oldTile.TypeId == ctx.SelectedTile.TypeId)
+                if (oldTile.TypeId == ctx.SelectedPaintTarget.Tile.TypeId)
                     continue;
 
                 var cmd = new SetTileCommand(ctx.MapSystem, gridUid, grid, pos, oldTile, ctx.GetVariantTile());

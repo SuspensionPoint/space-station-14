@@ -1,5 +1,6 @@
 using Content.IntegrationTests.Fixtures;
 using Content.IntegrationTests.Fixtures.Attributes;
+using Content.MapEditor;
 using Content.MapEditor.Commands;
 using Content.MapEditor.Tools;
 using Content.Shared.CCVar;
@@ -52,20 +53,20 @@ public sealed class SelectToolTest : GameTest
             var selectTool = new SelectTool();
 
             // Simulate drag from (0,0) to (2,2).
-            selectTool.OnMouseDown(ctx, new Vector2i(0, 0));
+            selectTool.OnMouseDown(ctx, new Vector2i(0, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             // During drag, DragStart and DragEnd should be set.
             Assert.That(selectTool.DragStart, Is.Not.Null, "DragStart should be set during drag");
             Assert.That(selectTool.DragEnd, Is.Not.Null, "DragEnd should be set during drag");
             Assert.That(selectTool.Selection, Is.Null, "Selection should be null during drag");
 
-            selectTool.OnMouseDrag(ctx, new Vector2i(1, 1));
-            selectTool.OnMouseDrag(ctx, new Vector2i(2, 2));
+            selectTool.OnMouseDrag(ctx, new Vector2i(1, 1), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            selectTool.OnMouseDrag(ctx, new Vector2i(2, 2), new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             Assert.That(selectTool.DragEnd, Is.EqualTo(new Vector2i(2, 2)),
                 "DragEnd should track the latest drag position");
 
-            selectTool.OnMouseUp(ctx);
+            selectTool.OnMouseUp(ctx, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             // After mouse-up, drag properties should be cleared and Selection should be set.
             Assert.That(selectTool.DragStart, Is.Null, "DragStart should be null after mouse-up");
@@ -118,9 +119,9 @@ public sealed class SelectToolTest : GameTest
             var selectTool = new SelectTool();
 
             // Drag from (3,3) to (1,1) — reversed direction.
-            selectTool.OnMouseDown(ctx, new Vector2i(3, 3));
-            selectTool.OnMouseDrag(ctx, new Vector2i(1, 1));
-            selectTool.OnMouseUp(ctx);
+            selectTool.OnMouseDown(ctx, new Vector2i(3, 3), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            selectTool.OnMouseDrag(ctx, new Vector2i(1, 1), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            selectTool.OnMouseUp(ctx, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             Assert.That(selectTool.Selection, Is.Not.Null);
             var sel = selectTool.Selection!.Value;
@@ -171,9 +172,9 @@ public sealed class SelectToolTest : GameTest
             var selectTool = new SelectTool();
 
             // Select the 3x3 area.
-            selectTool.OnMouseDown(ctx, new Vector2i(0, 0));
-            selectTool.OnMouseDrag(ctx, new Vector2i(2, 2));
-            selectTool.OnMouseUp(ctx);
+            selectTool.OnMouseDown(ctx, new Vector2i(0, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            selectTool.OnMouseDrag(ctx, new Vector2i(2, 2), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            selectTool.OnMouseUp(ctx, new EditorInput(){ InputButton =  EditorInputButton.Primary });
 
             // Delete the selection.
             selectTool.DeleteSelection(ctx);
@@ -239,16 +240,16 @@ public sealed class SelectToolTest : GameTest
             var selectTool = new SelectTool();
 
             // First drag.
-            selectTool.OnMouseDown(ctx, new Vector2i(0, 0));
-            selectTool.OnMouseDrag(ctx, new Vector2i(2, 2));
-            selectTool.OnMouseUp(ctx);
+            selectTool.OnMouseDown(ctx, new Vector2i(0, 0), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            selectTool.OnMouseDrag(ctx, new Vector2i(2, 2), new EditorInput(){ InputButton =  EditorInputButton.Primary });
+            selectTool.OnMouseUp(ctx, new EditorInput(){ InputButton =  EditorInputButton.Primary });
             Assert.That(selectTool.Selection, Is.Not.Null);
 
             // Start a new drag — previous selection should be cleared.
-            selectTool.OnMouseDown(ctx, new Vector2i(5, 5));
+            selectTool.OnMouseDown(ctx, new Vector2i(5, 5), new EditorInput(){ InputButton =  EditorInputButton.Primary });
             Assert.That(selectTool.Selection, Is.Null, "Previous selection should be cleared on new drag");
 
-            selectTool.OnMouseUp(ctx);
+            selectTool.OnMouseUp(ctx, new EditorInput(){ InputButton =  EditorInputButton.Primary });
         });
 
         await server.WaitPost(() => mapSystem.DeleteMap(mapId));
