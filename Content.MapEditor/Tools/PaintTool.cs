@@ -132,7 +132,11 @@ public sealed class PaintTool : IEditorTool
 
         foreach (var entity in entities)
         {
-            if(entity == ctx.ActiveGridUid) continue;
+            if (entity == ctx.ActiveGridUid)
+                continue;
+
+            if (!ctx.EntityManager.HasComponent<MetaDataComponent>(entity))
+                continue;
 
             var cmd = new DeleteEntityCommand(ctx.EntityManager, entity);
 
